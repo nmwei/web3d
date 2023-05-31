@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<canvas width="300" height="300"></canvas>
+<script>
+    //获取了 WebGL 上下文
+    const canvas = document.querySelector('canvas')
+    const gl = canvas.getContext('webgl')
+    //定义顶点着色器程序源码
+    const vertex = `
+        attribute vec2 position;  //定义了一个顶点属性 position，类型为二维向量。
+        varying vec3 color; // 定义了一个插值变量 color，类型为三维向量
+        void main() {
+            gl_PointSize = 1.0; //设置绘制的点的大小为 1.0
+            color = vec3(0.5 + position * 0.5, 0.0); // 计算顶点的颜色值，使用 position 进行计算，并将结果赋值给 color
+            gl_Position = vec4(position * 0.5, 1.0, 1.0); //计算顶点的裁剪坐标，使用 position 进行计算
+        }
+    `;
+
+    //定义片元着色器程序源码
+    const fragment = `
+        precision mediump float; //声明浮点数的精度为中等精度
+        varying vec3 color; // 定义了一个插值变量 color，类型为三维向量
+        void main(){
+            gl_FragColor = vec4(color, 1.0);
+            //gl_FragColor 是一个内建变量，在片元着色器中用于设置最终的颜色输出
+            //vec4(color, 1.0) 创建了一个四维向量，其中 color 是之前在顶点着色器中计算得到的插值颜色，而 1.0 表示完全不透明
+        }
+    `;
+    //创建了一个顶点着色器对象，并将顶点着色器的源码传递给它
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertexShader, vertex)
+    gl.compileShader(vertexShader); //编译顶点着色器
+
+    //这段代码创建了一个片元着色器对象，并将片元着色器的源码传递给它
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragmentShader, fragment);
+    gl.compileShader(fragmentShader); //编译片元着色器
+
+    //创建了一个 WebGL 程序对象
+    const program = gl.createProgram();
+    gl.attachShader(program, vertexShader); //顶点着色器附加该程序对象上
+    gl.attachShader(program, fragmentShader); //片元着色器附加到程序对象上
+    gl.linkProgram(program); //链接程序对象
+    gl.useProgram(program); //激活该程序对象
+
+    //创建了一个包含顶点坐标的浮点数组。每个顶点由两个浮点数表示，依次是顶点的 x 和 y 坐标。
+    const points = new Float32Array([
+        -1, -1,
+        0, 1,
+        1, -1,
+    ]);
+
+    //创建了一个缓冲区对象，并将其绑定到 ARRAY_BUFFER 目标上
+    const bufferId = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+    //将顶点数据存储到缓冲区中
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+
+    //获取了顶点着色器中的 position 属性的位置
+    const vPosition = gl.getAttribLocation(program, 'position');
+    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);//指定顶点属性的数据格式
+    gl.enableVertexAttribArray(vPosition); //启用该顶点属性
+
+    gl.clear(gl.COLOR_BUFFER_BIT); //清除颜色缓冲区
+    gl.drawArrays(gl.TRIANGLES, 0, points.length / 2); //根据提供的顶点数据绘制三角形
+</script>
+
+</body>
+</html>
