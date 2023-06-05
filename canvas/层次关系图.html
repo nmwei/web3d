@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<canvas width="600" height="600"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/d3-hierarchy@3"></script>
+<script>
+    var data = {
+        "name":"中国",
+        "children": [
+            { "name":"浙江" , "children": [ {"name":"杭州" }, {"name":"宁波" }, {"name":"温州" }, {"name":"绍兴" }]},
+            { "name":"广西" , "children": [ {"name":"桂林"}, {"name":"南宁"}]}
+        ]
+    }
+    //把数据转换成图形信息
+    const regions = d3.hierarchy(data)
+        .sum(d => 1)
+        .sort((a, b) => b.value - a.value); //将省份数据按照包含城市的数量，从多到少排序
+
+    const pack = d3.pack()
+        .size([600, 600]) //将数据映射为一组 1600 宽高范围内的圆形
+        .padding(3); //在每个相邻的圆之间我们还保留 3 个像素的 padding（
+
+    const root = pack(regions);
+
+    //遍历数据并且根据数据内容绘制圆弧
+    function draw(ctx, node, {fillStyle = 'rgba(0, 0, 0, 0.2)', textColor = 'white'} = {}) {
+        const TAU = 2 * Math.PI;
+        const children = node.children;
+        const {x, y, r} = node;
+        ctx.fillStyle = fillStyle;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, TAU);
+        ctx.fill();
+        if(children) {
+            for(let i = 0; i < children.length; i++) {
+                draw(ctx, children[i]);
+            }
+        } else {
+            const name = node.data.name;
+            ctx.fillStyle = textColor;
+            ctx.font = '1.5rem Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(name, x, y);
+        }
+    }
+
+    draw(document.querySelector('canvas').getContext('2d'), root);
+
+
+</script>
+</body>
+</html>

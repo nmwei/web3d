@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<canvas width="512" height="512"></canvas>
+
+<script>
+  const canvas = document.querySelector('canvas')
+  const context = canvas.getContext('2d')
+  const rectSize = [100, 100]
+  context.fillStyle = 'red'
+  context.beginPath()
+  context.save(); // 暂存状态
+  context.translate(-0.5 * rectSize[0], -0.5 * rectSize[1]) //给画布设置平移变换(translate)使矩形居中
+  context.rect(0.5 * canvas.width, 0.5 * canvas.height, ...rectSize)
+  context.fill()
+  context.restore(); // 恢复状态(恢复平移变换)
+</script>
+
+</body>
+</html>
