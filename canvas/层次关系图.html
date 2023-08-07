@@ -28,12 +28,11 @@
 
     //遍历数据并且根据数据内容绘制圆弧
     function draw(ctx, node, {fillStyle = 'rgba(0, 0, 0, 0.2)', textColor = 'white'} = {}) {
-        const TAU = 2 * Math.PI;
         const children = node.children;
         const {x, y, r} = node;
         ctx.fillStyle = fillStyle;
         ctx.beginPath();
-        ctx.arc(x, y, r, 0, TAU);
+        ctx.arc(x, y, r, 0, 2 * Math.PI);
         ctx.fill();
         if(children) {
             for(let i = 0; i < children.length; i++) {

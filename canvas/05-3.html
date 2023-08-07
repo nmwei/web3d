@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <canvas width="512" height="512"></canvas>
+  <script>
+    class Vector2D extends Array { //向量操作类
+        constructor(x = 1, y = 0) {
+            super(x, y)
+            this.x = x
+            this.y = y
+        }
+
+        set x(v) {
+            this[0] = v
+        }
+
+        set y(v) {
+            this[1] = v
+        }
+
+        get x() {
+            return this[0]
+        }
+
+        get y() {
+            return this[1]
+        }
+
+        rotate(rad) { //旋转
+            const c = Math.cos(rad)
+            const s = Math.sin(rad)
+            const [x, y] = this
+            const x1 = x * c - y * s
+            const y1 = y * c + x * s
+            this.x = x1
+            this.y = y1
+            return this
+        }
+
+        copy() { //复制
+            return new Vector2D(this.x, this.y)
+        }
+
+        add(v) { //移动
+            this.x += v.x;
+            this.y += v.y;
+            return this
+        }
+
+        scale(a) { //缩放
+            this.x *= a
+            this.y *= a
+            return this
+        }
+    }
+    const canvas = document.querySelector('canvas')
+    const ctx = canvas.getContext('2d')
+    ctx.translate(0, canvas.height) ////坐标原点从左上角移动到左下角
+    ctx.scale(1, -1)  //让 y 轴翻转为向上
+    ctx.lineCap = 'round' //圆形端盖线型
+    function drawBranch(context, v0, length, thickness, dir, bias) {
+        // context Canvas2D 上下文; v0 起始向量;
+        // length 当前树枝的长度; thickness 当前树枝的粗细
+        // dir 是当前树枝的方向，用与 x 轴的夹角表示，单位是弧度。
+        // bias 是一个随机偏向因子，用来让树枝的朝向有一定的随机性
+
+        const v = new Vector2D(1, 0).rotate(dir).scale(length)
+        const v1 = v0.copy().add(v) //在v0的基础上移动，且不修改v0的值
+        ctx.lineWidth = thickness
+        ctx.beginPath()
+        ctx.moveTo(...v0)
+        ctx.lineTo(...v1)
+        ctx.stroke()
+        if(thickness > 2) { //每次将树枝分叉成左右两个分枝
+            //const left = dir + 0.2; //不加随机偏向因子
+            const left = Math.PI / 4 + 0.5 * (dir + 0.2) + bias * (Math.random() - 0.5);
+            drawBranch(context, v1, length * 0.9, thickness * 0.8,left, bias * 0.9)
+            //const right = dir - 0.2;
+            const right = Math.PI / 4 + 0.5 * (dir - 0.2) + bias * (Math.random() - 0.5);
+            drawBranch(context, v1, length * 0.9, thickness * 0.8, right, bias * 0.9)
+        }
+
+        if(thickness < 5 && Math.random() < 0.5) {
+            context.save(); //保存之前的画布状态，不用担心影响save()之前的画布
+            ctx.strokeStyle = '#c72c35';
+            ctx.lineWidth = Math.random() * 6 + 5;
+            ctx.beginPath()
+            ctx.moveTo(...v1)
+            ctx.lineTo(v1.x, v1.y - 2)
+            ctx.stroke()
+            ctx.restore()
+        }
+    }
+
+    const v0 = new Vector2D(256, 0);
+    drawBranch(ctx, v0, 50, 10, Math.PI / 2, 3)
+  </script>
+
+
+</body>
+</html>

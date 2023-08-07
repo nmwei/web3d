@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <canvas width="512" height="256"></canvas>
+
+
+  x1 = x0 * cosB - y0  * sinB
+
+  y1 = y0 * cosB + x0 * sinB
+
+
+  <script src="https://unpkg.com/roughjs@4.5.2/bundled/rough.js"></script>
+  <script>
+    const rc = rough.canvas(document.querySelector('canvas'));
+    const ctx = rc.ctx;
+    ctx.translate(256, 256);
+    ctx.scale(1, -1);
+    const hillOpts = {roughness: 2.8, strokeWidth: 2, fill: 'blue'};
+    rc.path('M-180 0L-80 100L20 0', hillOpts);
+    rc.path('M-20 0L80 100L180 0', hillOpts);
+    rc.circle(0, 150, 105, {
+      stroke: 'red',
+      strokeWidth: 4,
+      fill: 'rgba(255,255, 0, 0.4)',
+      fillStyle: 'solid',
+    });
+  </script>
+<!--  <script>
+    const rc = rough.canvas(document.querySelector('canvas'))
+    const hillOpts = {
+      roughness: 2.8,  //粗糙程度
+      strokeWidth: 2,  //线型宽度
+      fill: 'blue'     //路径填充颜色
+    }
+    rc.path('M76 256L176 156L276 256', hillOpts)
+    //'M'：移动到指定的坐标点。'L'：从当前位置绘制一条直线到指定的坐标点。
+    rc.path('M236 256L336 156L436 256', hillOpts)
+    rc.circle(256, 106, 105, {
+      stroke: 'red',
+      strokeWidth: 4,
+      fill: 'rgba(255, 255, 0, 0.4)',
+      fillStyle: 'solid',
+    });
+  </script>-->
+
+</body>
+</html>
